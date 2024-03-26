@@ -1,0 +1,26 @@
+
+
+.toolbar {
+  padding: 8px 0 8px;
+  display: flex;
+  align-items: center;
+
+  &.selected {
+    background: #ccc;
+    position: relative;
+    &::before {
+      content: '';
+      height: 100%;
+      width: 2px;
+      background: #2564cf;
+      position:absolute;
+      z-index: 1;
+   
+    }
+  }
+
+  .icon {
+    margin: 0 10px;
+    color: cornflowerblue;
+  }
+}
