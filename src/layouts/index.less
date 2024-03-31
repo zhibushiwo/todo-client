@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #eee;
+  background: #f2f2f2;
 
   .header {
     height: 50px;
@@ -14,6 +14,7 @@
     flex-direction: row;
     padding: 8px;
     min-height: 0;
+
     .aside {
       display: flex;
       flex-direction: column;
@@ -21,6 +22,7 @@
       overflow: hidden;
 
       .navs {
+        margin-top: 8px;
         overflow-y: auto;
         flex: 1;
       }
@@ -28,6 +30,9 @@
 
     .content {
       flex: 1;
+      border-radius: 8px;
+      background: #5e72c0;
+      padding: 40px;
     }
   }
 

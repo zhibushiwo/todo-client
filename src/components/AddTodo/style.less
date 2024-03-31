@@ -1,0 +1,22 @@
+.wrap {
+  display: flex;
+  padding: 8px;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  * {
+    margin: 0 3px;
+  }
+
+  .text {
+    flex: 1;
+  }
+
+  :global(.ant-input) {
+    border: unset;
+
+    :focus {
+      box-shadow: unset;
+    }
+  }
+}
