@@ -1,3 +1,6 @@
 {
-  "extends": "./src/.umi/tsconfig.json"
+  "extends": "./src/.umi/tsconfig.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+  }
 }
