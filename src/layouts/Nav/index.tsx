@@ -1,43 +1,47 @@
 import React, { FC, useState } from 'react';
 import ToolBar from '@/components/ToolBar';
+
 import {
-  SunOutlined,
-  StarOutlined,
-  ProjectOutlined,
-  UserOutlined,
-  HomeOutlined,
-} from '@ant-design/icons';
+  MyDayIcon,
+  ImportantIcon,
+  PlannedIcon,
+  TaskIcon,
+  AssignedToMeIcon
+} from '@/components/Icons'
+
 interface INav {}
+
+
 
 const Nav: FC<INav> = () => {
   const navList = [
     {
       title: '我的一天',
-      icon: <SunOutlined />,
+      icon: <MyDayIcon />,
       to: '/myDay',
     },
 
     {
       title: '重要',
-      icon: <StarOutlined />,
+      icon: <ImportantIcon />,
       to: '/important',
     },
 
     {
       title: '计划内',
-      icon: <ProjectOutlined />,
+      icon: <PlannedIcon />,
       to: '/planned',
     },
 
     {
       title: '已分配给我',
-      icon: <UserOutlined />,
+      icon: <AssignedToMeIcon />,
       to: '/assignedToMe',
     },
 
     {
       title: '任务',
-      icon: <HomeOutlined />,
+      icon: <TaskIcon />,
       to: '/tasks',
     },
   ];

@@ -7,6 +7,8 @@ import {
   ClockCircleOutlined,
   RetweetOutlined,
 } from '@ant-design/icons';
+import { DeadLineIcon, RepeatIcon, RemindIcon } from '@/components/Icons';
+
 import TodoType from './TodoType';
 import styles from './style.less';
 interface IAddTodo {}
@@ -18,9 +20,9 @@ const AddTodo: FC<IAddTodo> = () => {
       <PlusOutlined />
       <Input className={styles.text} />
       <TodoType icon={<MenuOutlined />} text='任务' />
-      <CalendarOutlined />
-      <ClockCircleOutlined />
-      <RetweetOutlined />
+      <DeadLineIcon />
+      <RemindIcon />
+      <RepeatIcon />
     </div>
   );
 };
