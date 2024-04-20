@@ -1,75 +1,27 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import PageHeader from './PageHeader';
 import AddTodo from '@/components/AddTodo';
 import Todo from '@/components/Todo';
 import TodoList from '@/components/TodoList';
 import styles from './style.less';
+import { initTodoListData } from '@/store/todoList';
+import { useAppDispatch } from '@/hooks';
+import { useAppSelector } from '@/hooks';
 interface IMyDay {}
 
 const MyDay: FC<IMyDay> = () => {
-  const list = [
-    {
-      type: '先前',
-      todos: [
-        {
-          content: '1111111111111111111',
-          todoType: '任务',
-        },
-        {
-          content: '1111111111111111111',
-          todoType: '任务',
-        },
-        {
-          content: '1111111111111111111',
-          todoType: '任务',
-        },
-      ],
-    },
-    {
-      type: '明天',
-      todos: [
-        {
-          content: '1111111111111111111',
-          todoType: '任务',
-        },
-        {
-          content: '1111111111111111111',
-          todoType: '任务',
-        },
-        {
-          content: '1111111111111111111',
-          todoType: '任务',
-        },
-      ],
-    },
-  ];
+  const data = useAppSelector(state => state.todoReducer);
 
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(initTodoListData([]));
+  }, []);
   return (
     <div className={styles.wrap}>
       <PageHeader />
       <div className={styles.todos}>
-        {/* <div>
-          <Todo
-            content='11111111111111111111111111 11111111111111111111111111  11111111111111111111111111 11111111111111111111111111  11111111111111111111111111  11111111111111111111111111 1111111111111111111111111111111111111111111111111111'
-            todoType='任务'
-          />
-        </div>
-        <div>
-          <Todo content='11111111111111111111111111' todoType='任务' />
-        </div>
-        <div>
-          <Todo
-            stared
-            step={{ total: 4, current: 1 }}
-            hasAttachment
-            hasRemark
-            isRepeat
-            content='11111111111111111111111111'
-            todoType='任务'
-          />
-        </div> */}
-        {list.map(item => (
-          <TodoList {...item} />
+        {data.map(item => (
+          <Todo {...item} />
         ))}
       </div>
       <div className={styles.add}>

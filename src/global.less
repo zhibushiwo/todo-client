@@ -5,3 +5,34 @@ body,
 #root {
   height: 100vh;
 }
+
+#root {
+  .todo-input {
+    border: unset;
+
+    &:focus {
+      box-shadow: unset;
+    }
+  }
+}
+
+::-webkit-scrollbar-track-piece {
+  width: 5px;
+  background-color: #ccc;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  height: 50px;
+  background: #4e4e5a;
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4e4e5a;
+  cursor: pointer;
+}

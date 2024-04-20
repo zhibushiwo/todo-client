@@ -9,29 +9,14 @@ import {
 import { Drawer } from 'antd';
 import TodoDetail from '@/components/TodoDetail';
 import styles from './style.less';
-type TStep = {
-  total: number;
-  current: number;
-};
+import { ITodo } from '@/type';
 
-export interface ITodo {
-  content: string;
-  finished?: boolean;
-  stared?: boolean;
-  todoType: string;
-  hasAttachment?: boolean;
-  hasRemark?: boolean;
-  step?: TStep;
-  remindData?: string;
-  isRepeat?: boolean;
-}
 
 const Todo: FC<ITodo> = ({
-  content,
+  title,
   hasAttachment,
   todoType,
-  stared,
-  step,
+  steps,
   hasRemark,
   remindData,
   isRepeat,
@@ -50,10 +35,10 @@ const Todo: FC<ITodo> = ({
           <CheckCircleOutlined />
         </div>
         <div className={styles.content}>
-          <div className={styles.text}>{content}</div>
+          <div className={styles.text}>{title}</div>
           <div className={styles.detail}>
             <span>{todoType}</span>
-            <span>{step && `第${step.current}步，共${step.total}步 ·`}</span>
+            <span>{steps && `第${0}步，共${steps.length}步 ·`}</span>
             <span> {remindData}</span>
             <span>{isRepeat && <SyncOutlined />}</span>
             <span>{hasRemark && <FileWordOutlined />}</span>
