@@ -6,7 +6,7 @@ import Search from './Search';
 import Header from './Header';
 import Nav from './Nav';
 import BottomBar from './BottomBar';
-import TaskList from './TaskList';
+import TaskList from '@/components/TaskList';
 export default function Layout() {
   return (
     <div className={styles.wrap}>

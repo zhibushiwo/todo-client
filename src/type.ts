@@ -1,4 +1,3 @@
-
 export interface ITodo {
   id: number;
   title: string;
@@ -25,11 +24,12 @@ export interface ITodoList {
   title: string;
   groupId?: number;
   todos?: ITodo[];
+  type: string;
 }
 
 export interface ITodoGroup {
+  type: string;
   id: number;
   title: string;
   todoList?: ITodoList[];
 }
-

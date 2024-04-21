@@ -29,16 +29,16 @@ export const todoListSlice = createSlice({
     editData(
       state,
       action: PayloadAction<{
-        groupIndex: number | null;
+        gIndex: number | null;
         index: number;
         data: TListOrGroup;
       }>
     ) {
-      const { groupIndex, index, data } = action.payload;
-      if (isNil(groupIndex)) {
+      const { gIndex, index, data } = action.payload;
+      if (isNil(gIndex)) {
         state[index] = data;
       } else {
-        (state[groupIndex] as ITodoGroup).todoList![index] = data;
+        (state[gIndex] as ITodoGroup).todoList![index] = data;
       }
     },
     removeList(
