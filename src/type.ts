@@ -1,3 +1,4 @@
+
 export interface ITodo {
   id: number;
   title: string;
@@ -31,3 +32,4 @@ export interface ITodoGroup {
   title: string;
   todoList?: ITodoList[];
 }
+

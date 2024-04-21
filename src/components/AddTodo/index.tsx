@@ -6,18 +6,19 @@ import TodoType from './TodoType';
 import styles from './style.less';
 import { useAppDispatch } from '@/hooks';
 import { TodoActions } from '@/store/todo';
+import { uniqueId } from 'lodash-es';
 
 interface IAddTodo {}
 
 const AddTodo: FC<IAddTodo> = () => {
-  const [text, setText] = useState('');
   const dispatch = useAppDispatch();
 
   const addData = (value: string) => {
     dispatch(
       TodoActions.addTodo({
         title: value,
-        id: 1,
+        id: Number(uniqueId()),
+        todoType: '任务',
       })
     );
   };

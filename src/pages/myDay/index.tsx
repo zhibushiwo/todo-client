@@ -20,8 +20,8 @@ const MyDay: FC<IMyDay> = () => {
     <div className={styles.wrap}>
       <PageHeader />
       <div className={styles.todos}>
-        {data.map(item => (
-          <Todo {...item} />
+        {data.map((item, index) => (
+          <Todo key={index} {...item} />
         ))}
       </div>
       <div className={styles.add}>

@@ -6,12 +6,10 @@ import {
   ImportantIcon,
   PlannedIcon,
   TaskIcon,
-  AssignedToMeIcon
-} from '@/components/Icons'
+  AssignedToMeIcon,
+} from '@/components/Icons';
 
 interface INav {}
-
-
 
 const Nav: FC<INav> = () => {
   const navList = [
@@ -48,8 +46,8 @@ const Nav: FC<INav> = () => {
 
   return (
     <>
-      {navList.map(props => (
-        <ToolBar {...props} />
+      {navList.map((props, index) => (
+        <ToolBar key={index} {...props} />
       ))}
     </>
   );

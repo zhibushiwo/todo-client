@@ -11,16 +11,16 @@ import TodoDetail from '@/components/TodoDetail';
 import styles from './style.less';
 import { ITodo } from '@/type';
 
-
-const Todo: FC<ITodo> = ({
-  title,
-  hasAttachment,
-  todoType,
-  steps,
-  hasRemark,
-  remindData,
-  isRepeat,
-}) => {
+const Todo: FC<ITodo> = todo => {
+  const {
+    title,
+    hasAttachment,
+    todoType,
+    steps,
+    hasRemark,
+    remindData,
+    isRepeat,
+  } = todo;
   const [detailVisible, setDetailVisible] = useState(false);
 
   const handleDetail = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -50,7 +50,7 @@ const Todo: FC<ITodo> = ({
         </div>
       </div>
       <Drawer open={detailVisible} onClose={() => setDetailVisible(false)}>
-        <TodoDetail />
+        <TodoDetail {...todo} />
       </Drawer>
     </>
   );
