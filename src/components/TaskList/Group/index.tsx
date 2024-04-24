@@ -1,20 +1,32 @@
-import React, { FC, useRef } from 'react';
+import React, { FC, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import TaskList from '../List';
-
-import { IDragList, IChangeFunc, IDragGroup } from '../type';
+import Input from '@/components/Input';
+import { IDragList, IHandleSwitch, IDragGroup } from '../type';
 import { LIST_SYMBOL, GROUP_SYMBOL } from '../constant';
 import { ITodoList } from '@/type';
+import { InputRef } from 'antd';
+
 interface ITaskGroup {
   id: number;
   index: number;
   title: string;
   todoList: ITodoList[];
-  changeFunc: IChangeFunc;
+  handleSwitch: IHandleSwitch;
+  handleRename?: (id: id, value: string) => void;
 }
 
-const TaskGroup: FC<ITaskGroup> = ({ changeFunc, index, title, id, todoList }) => {
+const TaskGroup: FC<ITaskGroup> = ({
+  handleSwitch,
+  handleRename,
+  index,
+  title,
+  id,
+  todoList,
+}) => {
   const domRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<InputRef>(null);
+  const [editable, setEditable] = useState(false);
   const [{ isDragging }, dragRef] = useDrag(
     () => ({
       type: GROUP_SYMBOL,
@@ -28,8 +40,11 @@ const TaskGroup: FC<ITaskGroup> = ({ changeFunc, index, title, id, todoList }) =
           isDragging: monitor.isDragging(),
         };
       },
+      canDrag(monitor) {
+        return !editable;
+      },
     }),
-    [index]
+    [index, editable]
   );
 
   const [, dropRef] = useDrop<IDragGroup | IDragList>(
@@ -54,9 +69,9 @@ const TaskGroup: FC<ITaskGroup> = ({ changeFunc, index, title, id, todoList }) =
           }
           let cIndex = 0;
           if (item.gIndex > index) {
-            cIndex = lists.length;
+            cIndex = todoList.length;
           }
-          changeFunc([item.gIndex, item.index], [index, cIndex]);
+          handleSwitch([item.gIndex, item.index], [index, cIndex]);
           item.index = cIndex;
           item.gIndex = gIndex;
           return;
@@ -74,18 +89,45 @@ const TaskGroup: FC<ITaskGroup> = ({ changeFunc, index, title, id, todoList }) =
         if (dragIndex < index && hoverActualY < hoverMiddleY) return;
         // 如果是向上拖，只有当hover的坐标大于自身高度的一半时，继续保持drag，否则相当于要挪动其他的list item，给当前的item腾个地方
         if (dragIndex > index && hoverActualY > hoverMiddleY) return;
-        console.log('list changeFunc');
-        changeFunc([dragIndex], [index]);
+        console.log('list handleSwitch');
+        handleSwitch([dragIndex], [index]);
         item.index = index;
       },
     }),
-    [todoList, index, changeFunc]
+    [todoList, index, handleSwitch]
   );
 
   dropRef(dragRef(domRef));
+
+  const changeTitle = (value: string) => {
+    if (value !== title && value) {
+      handleRename?.(id, value);
+    }
+    setEditable(false);
+  };
+
   return (
     <div ref={domRef}>
-      <div>{title}</div>
+      <div
+        onDoubleClick={() => {
+          setEditable(true);
+          setTimeout(() => {
+            // inputRef.current?.focus();
+            inputRef.current?.select();
+          }, 0);
+        }}
+      >
+        {editable ? (
+          <Input
+            value={title}
+            onBlur={e => changeTitle(e.target.value)}
+            onEnter={changeTitle}
+            ref={inputRef}
+          />
+        ) : (
+          title
+        )}
+      </div>
       <div>
         {todoList.map((item, _index) => {
           return (
@@ -93,7 +135,8 @@ const TaskGroup: FC<ITaskGroup> = ({ changeFunc, index, title, id, todoList }) =
               id={item.id}
               key={item.title}
               title={item.title}
-              changeFunc={changeFunc}
+              handleSwitch={handleSwitch}
+              handleRename={handleRename}
               index={_index}
               gIndex={index}
             />

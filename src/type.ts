@@ -1,10 +1,11 @@
+import { LIST_ENUM } from '@/constant/enum';
 export interface ITodo {
-  id: number;
+  id: id;
   title: string;
   status?: number;
   importance?: number;
   steps?: ITodoStep[];
-  listId?: number;
+  listId?: id;
   todoType?: string;
   hasAttachment?: boolean;
   hasRemark?: boolean;
@@ -13,23 +14,23 @@ export interface ITodo {
 }
 
 export interface ITodoStep {
-  id: number;
+  id: id;
   title: string;
-  todoId: number;
+  todoId: id;
   status?: number;
 }
 
 export interface ITodoList {
-  id: number;
+  id: id;
   title: string;
-  groupId?: number;
+  groupId?: id;
   todos?: ITodo[];
-  type: string;
+  type: LIST_ENUM;
 }
 
 export interface ITodoGroup {
-  type: string;
-  id: number;
+  type: LIST_ENUM;
+  id: id;
   title: string;
   todoList?: ITodoList[];
 }

@@ -5,10 +5,10 @@ export type TIndex = number | null | undefined;
 
 export type TGIndex = number;
 
-export type TChangePath = [TGIndex, TIndex?];
+export type TSwitchPath = [TGIndex, TIndex?];
 
-export interface IChangeFunc {
-  (prev: TChangePath, next: TChangePath): void;
+export interface IHandleSwitch {
+  (prev: TSwitchPath, next: TSwitchPath): void;
 }
 
 export interface IDragList extends Partial<ITodoList> {

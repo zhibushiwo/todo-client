@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { Input as AntdInput } from 'antd';
 
-import type { InputProps } from 'antd';
+import type { InputProps, InputRef } from 'antd';
 import { KEY_ENUM } from '@/constant/enum';
 import { TextAreaProps } from 'antd/es/input';
 const { TextArea: AntdTextArea } = AntdInput;
@@ -14,7 +14,9 @@ interface ITodoTextArea extends TextAreaProps {
   onEnter?: (value: string) => void;
 }
 
-export default (props: ITodoInput) => {
+// TODO 重复代码
+
+const Input = forwardRef<InputRef, ITodoInput>((props, ref) => {
   const {
     className,
     onKeyDown,
@@ -55,9 +57,10 @@ export default (props: ITodoInput) => {
       {...otherProps}
       className={`todo-input ${className}`}
       onKeyDown={onInputKeyDown}
+      ref={ref}
     />
   );
-};
+});
 
 export const TextArea = (props: ITodoTextArea) => {
   const {
@@ -103,3 +106,5 @@ export const TextArea = (props: ITodoTextArea) => {
     />
   );
 };
+
+export default Input;

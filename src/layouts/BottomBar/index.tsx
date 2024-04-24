@@ -3,28 +3,16 @@ import { PlusOutlined, FolderAddOutlined } from '@ant-design/icons';
 import styles from './style.less';
 import { useAppDispatch } from '@/hooks';
 import { TodoListActions } from '@/store/todoList';
-import { uniqueId } from 'lodash-es';
+import { LIST_ENUM } from '@/constant/enum';
 interface IBottomBar {}
 
 const BottomBar: FC<IBottomBar> = () => {
   const dispatch = useAppDispatch();
   const handleAddList = () => {
-    dispatch(
-      TodoListActions.addData({
-        id: Number(uniqueId()),
-        title: '2222222222',
-        type: 'list',
-      })
-    );
+    dispatch(TodoListActions.addData(LIST_ENUM.LIST));
   };
   const handleAddGroup = () => {
-    dispatch(
-      TodoListActions.addData({
-        id: Number(uniqueId()),
-        title: '11111111',
-        type: 'group',
-      })
-    );
+    dispatch(TodoListActions.addData(LIST_ENUM.GROUP));
   };
   return (
     <div className={styles['bottom-bar']}>

@@ -1,12 +1,12 @@
 import React, { FC, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { LIST_SYMBOL } from '../constant';
-import { IChangeFunc } from '../type';
+import { IHandleSwitch } from '../type';
 import { IDragList } from '../type';
 import { isNil } from 'lodash-es';
 interface IBlank {
   index: number;
-  changeFunc: IChangeFunc;
+  changeFunc: IHandleSwitch;
 }
 
 const Blank: FC<IBlank> = ({ index, changeFunc }) => {

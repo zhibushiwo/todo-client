@@ -1,9 +1,17 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { isNil } from 'lodash-es';
+import { isNil, set, uniqueId, get } from 'lodash-es';
+import { LIST_ENUM } from '@/constant/enum';
 import { NAME, INIT_ACTION } from './const';
 import { ITodoList, ITodoGroup } from '@/type';
+import { createNewName, getRename, getById } from './utils';
 
-type TListOrGroup = ITodoList | ITodoGroup;
+export type TListOrGroup = ITodoList | ITodoGroup;
+
+export type keyOfList = keyof ITodoList | keyof ITodoGroup;
+
+export type valueOfList =
+  | ITodoList[keyof ITodoList]
+  | ITodoGroup[keyof ITodoGroup];
 
 const initialState: TListOrGroup[] = [];
 
@@ -23,8 +31,33 @@ export const todoListSlice = createSlice({
     updateData(state, action: PayloadAction<TListOrGroup[]>) {
       return action.payload;
     },
-    addData(state, action: PayloadAction<TListOrGroup>) {
-      state.push(action.payload);
+    addData(state, action: PayloadAction<LIST_ENUM>) {
+      const newName = createNewName(state, action.payload);
+      state.push({
+        title: newName,
+        id: Number(uniqueId()),
+        type: action.payload,
+      });
+    },
+    renameData(
+      state,
+      action: PayloadAction<{
+        value: string;
+        id: id;
+        type: LIST_ENUM;
+      }>
+    ) {
+      const { value, id, type } = action.payload;
+      const current = getById(state, type, id);
+      console.log(current);
+      let newName = getRename({
+        list: state,
+        value,
+        type,
+        modifyId: current?.id,
+      });
+      console.log(newName);
+      if (current) current.title = newName;
     },
     editData(
       state,
@@ -40,6 +73,17 @@ export const todoListSlice = createSlice({
       } else {
         (state[gIndex] as ITodoGroup).todoList![index] = data;
       }
+    },
+
+    updateDataByKey(
+      state,
+      action: PayloadAction<{
+        key: TKeyPath;
+        value: any;
+      }>
+    ) {
+      const { key, value } = action.payload;
+      set(state, key, value);
     },
     removeList(
       state,
