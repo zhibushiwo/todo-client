@@ -6,10 +6,10 @@ import { IDragList } from '../type';
 import { isNil } from 'lodash-es';
 interface IBlank {
   index: number;
-  changeFunc: IHandleSwitch;
+  handleSwitch: IHandleSwitch;
 }
 
-const Blank: FC<IBlank> = ({ index, changeFunc }) => {
+const Blank: FC<IBlank> = ({ index, handleSwitch }) => {
   const domRef = useRef(null);
 
   const [, dropRef] = useDrop<IDragList>(() => ({
@@ -17,7 +17,7 @@ const Blank: FC<IBlank> = ({ index, changeFunc }) => {
     hover(item, monitor) {
       if (!isNil(item.index)) {
         if (item.gIndex === index + 1) return;
-        changeFunc([item.gIndex, item.index], [index + 1]);
+        handleSwitch([item.gIndex, item.index], [index + 1]);
         item.gIndex = index + 1;
         item.index = undefined;
       }
@@ -28,7 +28,7 @@ const Blank: FC<IBlank> = ({ index, changeFunc }) => {
     <div
       ref={domRef}
       style={{
-        minHeight: 10,
+        minHeight: 6,
       }}
     ></div>
   );

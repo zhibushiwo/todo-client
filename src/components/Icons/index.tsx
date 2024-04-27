@@ -10,6 +10,8 @@ import {
   RetweetOutlined,
   ClockCircleOutlined,
   FileWordOutlined,
+  WalletOutlined,
+  MenuOutlined,
 } from '@ant-design/icons';
 
 export const MyDayIcon = SunOutlined;
@@ -23,3 +25,5 @@ export const DeadLineIcon = CalendarOutlined;
 export const RepeatIcon = RetweetOutlined;
 export const RemindIcon = ClockCircleOutlined;
 export const FileIcon = FileWordOutlined;
+export const GroupIcon = WalletOutlined;
+export const ListIcon = MenuOutlined

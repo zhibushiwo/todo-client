@@ -4,8 +4,11 @@ import { isNil } from 'lodash-es';
 import { IDragList, IHandleSwitch, IDragGroup } from '../type';
 import { LIST_SYMBOL, GROUP_SYMBOL } from '../constant';
 import Input from '@/components/Input';
+import { ListIcon } from '@/components/Icons';
+import ListItem from '@/components/ListItem';
 import styles from './style.module.less';
 import { InputRef } from 'antd';
+import { confirmFuc } from '@/utils';
 interface ITaskList {
   id: number;
   index?: number;
@@ -14,12 +17,20 @@ interface ITaskList {
   handleSwitch?: IHandleSwitch;
   handleUpdate?: (key: TKeyPath, value: any) => void;
   handleRename?: (id: id, value: string) => void;
+  handleRemoveList: (gIndex: number, index?: number) => void;
+}
+
+enum MenuKeyEnum {
+  REMOVE = 'REMOVE',
+  ADD = 'ADD',
+  RENAME = 'RENAME',
 }
 
 const TaskList: FC<ITaskList> = ({
   handleSwitch,
   handleUpdate,
   handleRename,
+  handleRemoveList,
   index,
   gIndex,
   title,
@@ -102,11 +113,32 @@ const TaskList: FC<ITaskList> = ({
     setEditable(false);
   };
   dropRef(dragRef(domRef));
+  const onDelete = async () => {
+    await confirmFuc({
+      title: '删除列表',
+      content: `将永久删除"${title}"`,
+    });
+    handleRemoveList(gIndex, index);
+  };
+  const onRename = () => {
+    setEditable(true);
+    setTimeout(() => {
+      inputRef.current?.select();
+    }, 0);
+  };
+  const onMenuClick = (key: string) => {
+    switch (key) {
+      case MenuKeyEnum.REMOVE:
+        onDelete();
+        break;
+      case MenuKeyEnum.RENAME:
+        onRename();
+        break;
+    }
+  };
   return (
-    <div
-      ref={domRef}
-      data-handler-id={handlerId}
-      className={styles['todo-list']}
+    <ListItem
+      icon={<ListIcon />}
       onDoubleClick={() => {
         setEditable(true);
         setTimeout(() => {
@@ -114,6 +146,29 @@ const TaskList: FC<ITaskList> = ({
           inputRef.current?.select();
         }, 0);
       }}
+      data-handler-id={handlerId}
+      // className={styles['todo-list']}
+      contextMenus={{
+        items: [
+          {
+            label: '重命名列表',
+            key: MenuKeyEnum.RENAME,
+          },
+          {
+            type: 'divider',
+          },
+          {
+            label: '删除列表',
+            key: MenuKeyEnum.REMOVE,
+            danger: true,
+          },
+        ],
+        onClick(e) {
+          console.log(e.key);
+          onMenuClick(e.key);
+        },
+      }}
+      ref={domRef}
     >
       {editable ? (
         <Input
@@ -121,11 +176,12 @@ const TaskList: FC<ITaskList> = ({
           onBlur={e => changeTitle(e.target.value)}
           onEnter={changeTitle}
           ref={inputRef}
+          size='small'
         />
       ) : (
         title
       )}
-    </div>
+    </ListItem>
   );
 };
 

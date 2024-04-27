@@ -40,6 +40,23 @@ const TaskListWrap: FC<ITaskListWrap> = () => {
     );
   }, []);
 
+  const removeList = useCallback((gIndex: number, index?: number) => {
+    dispatch(
+      TodoListActions.removeList({
+        gIndex,
+        index,
+      })
+    );
+  }, []);
+
+  const removeGroup = useCallback((index: number) => {
+    dispatch(TodoListActions.removeGroup(index));
+  }, []);
+
+  const addList = useCallback((index: number) => {
+    dispatch(TodoListActions.addListByGroupIndex(index));
+  }, []);
+
   useEffect(() => {
     if (todoListLength.current < todoLists.length) {
     }
@@ -63,6 +80,8 @@ const TaskListWrap: FC<ITaskListWrap> = () => {
                 handleRename={(id, value) =>
                   handleRename(id, value, LIST_ENUM.LIST)
                 }
+                handleRemoveList={removeList}
+              
               />
             );
           } else {
@@ -77,6 +96,9 @@ const TaskListWrap: FC<ITaskListWrap> = () => {
                 handleRename={(id, value) =>
                   handleRename(id, value, LIST_ENUM.GROUP)
                 }
+                handleRemoveList={removeList}
+                handleRemoveGroup={removeGroup}
+                handleAddList = {()=>addList(index)}
               />
             );
           }
@@ -85,7 +107,7 @@ const TaskListWrap: FC<ITaskListWrap> = () => {
               {comp}
               <Blank
                 index={index}
-                changeFunc={handleSwitch}
+                handleSwitch={handleSwitch}
                 key={'blank_' + index}
               />
             </>

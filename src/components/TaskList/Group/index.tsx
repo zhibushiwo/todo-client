@@ -5,8 +5,12 @@ import Input from '@/components/Input';
 import { IDragList, IHandleSwitch, IDragGroup } from '../type';
 import { LIST_SYMBOL, GROUP_SYMBOL } from '../constant';
 import { ITodoList } from '@/type';
-import { InputRef } from 'antd';
-
+import { InputRef, Dropdown } from 'antd';
+import { GroupIcon } from '@/components/Icons';
+import ListItem from '@/components/ListItem';
+import styles from './style.module.less';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { confirmFuc } from '@/utils/';
 interface ITaskGroup {
   id: number;
   index: number;
@@ -14,19 +18,32 @@ interface ITaskGroup {
   todoList: ITodoList[];
   handleSwitch: IHandleSwitch;
   handleRename?: (id: id, value: string) => void;
+  handleRemoveList: (gIndex: number, index?: number) => void;
+  handleRemoveGroup: (index: number) => void;
+  handleAddList: () => void;
+}
+
+enum MenuKeyEnum {
+  REMOVE = 'REMOVE',
+  RENAME = 'RENAME',
+  ADD_LIST = 'ADD_LIST',
 }
 
 const TaskGroup: FC<ITaskGroup> = ({
   handleSwitch,
   handleRename,
+  handleRemoveList,
+  handleRemoveGroup,
+  handleAddList,
   index,
   title,
   id,
-  todoList,
+  todoList = [],
 }) => {
   const domRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<InputRef>(null);
   const [editable, setEditable] = useState(false);
+  const [expand, setExpand] = useState(false);
   const [{ isDragging }, dragRef] = useDrag(
     () => ({
       type: GROUP_SYMBOL,
@@ -106,43 +123,107 @@ const TaskGroup: FC<ITaskGroup> = ({
     setEditable(false);
   };
 
+  const onAddList = () => {
+    handleAddList();
+    if (!expand) setExpand(true);
+  };
+
+  const onRename = () => {
+    setEditable(true);
+    setTimeout(() => {
+      inputRef.current?.select();
+    }, 0);
+  };
+  const onRemove = async () => {
+    await confirmFuc({
+      title: '删除分组',
+      content: `将永久删除"${title}"`,
+    });
+    handleRemoveGroup(index);
+  };
+
+  const onMenuClick = (key: string) => {
+    switch (key) {
+      case MenuKeyEnum.ADD_LIST:
+        onAddList();
+        break;
+      case MenuKeyEnum.REMOVE:
+        onRemove();
+        break;
+      case MenuKeyEnum.RENAME:
+        onRename();
+        break;
+    }
+  };
+
   return (
-    <div ref={domRef}>
-      <div
-        onDoubleClick={() => {
-          setEditable(true);
-          setTimeout(() => {
-            // inputRef.current?.focus();
-            inputRef.current?.select();
-          }, 0);
+    <div ref={domRef} className={styles['todo-group']}>
+      <ListItem
+        icon={<GroupIcon />}
+        onClick={() => {
+          setExpand(state => !state);
         }}
+        contextMenus={{
+          items: [
+            {
+              label: '重命名组',
+              key: MenuKeyEnum.RENAME,
+            },
+            {
+              label: '新建列表',
+              key: MenuKeyEnum.ADD_LIST,
+            },
+            {
+              type: 'divider',
+            },
+            {
+              danger: todoList.length === 0,
+              label: todoList.length > 0 ? '取消分组' : '删除组',
+              key: MenuKeyEnum.REMOVE,
+            },
+          ],
+          onClick: e => {
+            onMenuClick(e.key);
+          },
+        }}
+        suffix={expand ? <UpOutlined /> : <DownOutlined />}
       >
-        {editable ? (
-          <Input
-            value={title}
-            onBlur={e => changeTitle(e.target.value)}
-            onEnter={changeTitle}
-            ref={inputRef}
-          />
-        ) : (
-          title
-        )}
-      </div>
-      <div>
-        {todoList.map((item, _index) => {
-          return (
-            <TaskList
-              id={item.id}
-              key={item.title}
-              title={item.title}
-              handleSwitch={handleSwitch}
-              handleRename={handleRename}
-              index={_index}
-              gIndex={index}
+        <div>
+          {editable ? (
+            <Input
+              value={title}
+              onBlur={e => changeTitle(e.target.value)}
+              onEnter={changeTitle}
+              ref={inputRef}
+              size='small'
             />
-          );
-        })}
-      </div>
+          ) : (
+            title
+          )}
+        </div>
+      </ListItem>
+      {expand && (
+        <div className={styles.list}>
+          {todoList.length === 0 ? (
+            <div>拖到此处来添加列表</div>
+          ) : (
+            todoList.map((item, _index) => {
+              return (
+                <TaskList
+                  id={item.id}
+                  key={item.id}
+                  title={item.title}
+                  handleSwitch={handleSwitch}
+                  handleRename={handleRename}
+                  index={_index}
+                  gIndex={index}
+                  handleRemoveList={handleRemoveList}
+                />
+              );
+            })
+          )}
+        </div>
+      )}
     </div>
   );
 };

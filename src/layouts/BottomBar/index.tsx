@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { PlusOutlined, FolderAddOutlined } from '@ant-design/icons';
-import styles from './style.less';
+import styles from './style.module.less';
 import { useAppDispatch } from '@/hooks';
 import { TodoListActions } from '@/store/todoList';
 import { LIST_ENUM } from '@/constant/enum';

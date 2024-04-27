@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { isNil, set, uniqueId, get } from 'lodash-es';
+import { isNil, set, uniqueId, get, isEmpty } from 'lodash-es';
 import { LIST_ENUM } from '@/constant/enum';
 import { NAME, INIT_ACTION } from './const';
 import { ITodoList, ITodoGroup } from '@/type';
@@ -38,6 +38,19 @@ export const todoListSlice = createSlice({
         id: Number(uniqueId()),
         type: action.payload,
       });
+    },
+    addListByGroupIndex(state, action: PayloadAction<number>) {
+      const newName = createNewName(state, LIST_ENUM.LIST);
+      const newData = {
+        id: Number(uniqueId()),
+        title: newName,
+        type: LIST_ENUM.LIST,
+      };
+      if (isEmpty((state[action.payload] as ITodoGroup).todoList)) {
+        (state[action.payload] as ITodoGroup).todoList = [newData];
+      } else {
+        (state[action.payload] as ITodoGroup).todoList?.push(newData);
+      }
     },
     renameData(
       state,
@@ -88,15 +101,15 @@ export const todoListSlice = createSlice({
     removeList(
       state,
       action: PayloadAction<{
-        groupIndex: number | null;
-        index: number;
+        gIndex: number;
+        index?: number | null;
       }>
     ) {
-      const { groupIndex, index } = action.payload;
-      if (isNil(groupIndex)) {
-        state.splice(index, 1);
+      const { gIndex, index } = action.payload;
+      if (isNil(index)) {
+        state.splice(gIndex, 1);
       } else {
-        (state[groupIndex] as ITodoGroup).todoList?.splice(index, 1);
+        (state[gIndex] as ITodoGroup).todoList?.splice(index, 1);
       }
     },
     removeGroup(state, action: PayloadAction<number>) {
