@@ -34,7 +34,12 @@ const ListItem = forwardRef<HTMLDivElement, IListItem>(
     );
     if (needContextMenu) {
       return (
-        <Dropdown menu={contextMenus} trigger={['contextMenu']}>
+        <Dropdown
+          destroyPopupOnHide
+          overlayStyle={{ minWidth: 150 }}
+          menu={contextMenus}
+          trigger={['contextMenu']}
+        >
           {content}
         </Dropdown>
       );

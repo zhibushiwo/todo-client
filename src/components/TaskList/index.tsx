@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useRef, Fragment } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Blank from './Blank';
@@ -9,6 +9,7 @@ import { ITodoGroup } from '@/type';
 import { LIST_ENUM } from '@/constant/enum';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { TodoListActions, TListOrGroup } from '@/store/todoList';
+import { groupSelector } from '@/store/selector';
 import styles from './style.module.less';
 interface ITaskListWrap {}
 
@@ -16,7 +17,10 @@ const TaskListWrap: FC<ITaskListWrap> = () => {
   const dispatch = useAppDispatch();
   const todoListLength = useRef(0);
   const todoLists = useAppSelector(state => state.todoListReducer) || [];
-  const handleSwitch = useCallback<IHandleSwitch>((prev, next) => {}, []);
+  const allGroups = useAppSelector(groupSelector);
+  const handleSwitch = useCallback<IHandleSwitch>((prev, next) => {
+    dispatch(TodoListActions.switchData([prev, next]));
+  }, []);
 
   const handleUpdate = useCallback(
     (key: TKeyPath, value: any) => {
@@ -81,6 +85,7 @@ const TaskListWrap: FC<ITaskListWrap> = () => {
                   handleRename(id, value, LIST_ENUM.LIST)
                 }
                 handleRemoveList={removeList}
+                groups={allGroups}
               
               />
             );
@@ -93,24 +98,22 @@ const TaskListWrap: FC<ITaskListWrap> = () => {
                 index={index}
                 todoList={(item as ITodoGroup).todoList || []}
                 handleSwitch={handleSwitch}
-                handleRename={(id, value) =>
-                  handleRename(id, value, LIST_ENUM.GROUP)
-                }
+                handleRename={handleRename}
                 handleRemoveList={removeList}
                 handleRemoveGroup={removeGroup}
-                handleAddList = {()=>addList(index)}
+                handleAddList={() => addList(index)}
               />
             );
           }
           return (
-            <>
+            <Fragment>
               {comp}
               <Blank
                 index={index}
                 handleSwitch={handleSwitch}
                 key={'blank_' + index}
               />
-            </>
+            </Fragment>
           );
         })}
       </div>

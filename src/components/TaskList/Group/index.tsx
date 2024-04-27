@@ -4,8 +4,9 @@ import TaskList from '../List';
 import Input from '@/components/Input';
 import { IDragList, IHandleSwitch, IDragGroup } from '../type';
 import { LIST_SYMBOL, GROUP_SYMBOL } from '../constant';
-import { ITodoList } from '@/type';
-import { InputRef, Dropdown } from 'antd';
+import { ITodoList, ITodoGroup } from '@/type';
+import { LIST_ENUM } from '@/constant/enum';
+import { InputRef } from 'antd';
 import { GroupIcon } from '@/components/Icons';
 import ListItem from '@/components/ListItem';
 import styles from './style.module.less';
@@ -16,8 +17,9 @@ interface ITaskGroup {
   index: number;
   title: string;
   todoList: ITodoList[];
+  groups?: Pick<ITodoGroup, 'id' | 'title'>[];
   handleSwitch: IHandleSwitch;
-  handleRename?: (id: id, value: string) => void;
+  handleRename?: (id: id, value: string, type: LIST_ENUM) => void;
   handleRemoveList: (gIndex: number, index?: number) => void;
   handleRemoveGroup: (index: number) => void;
   handleAddList: () => void;
@@ -39,6 +41,7 @@ const TaskGroup: FC<ITaskGroup> = ({
   title,
   id,
   todoList = [],
+  groups,
 }) => {
   const domRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<InputRef>(null);
@@ -70,6 +73,7 @@ const TaskGroup: FC<ITaskGroup> = ({
       hover(item, monitor) {
         const dragIndex = item?.index!;
         if (monitor.getItemType() === LIST_SYMBOL) {
+          if (!expand) setExpand(true);
           item = item as IDragList;
           if (!monitor.isOver({ shallow: true })) {
             return;
@@ -118,7 +122,7 @@ const TaskGroup: FC<ITaskGroup> = ({
 
   const changeTitle = (value: string) => {
     if (value !== title && value) {
-      handleRename?.(id, value);
+      handleRename?.(id, value, LIST_ENUM.GROUP);
     }
     setEditable(false);
   };
@@ -205,7 +209,7 @@ const TaskGroup: FC<ITaskGroup> = ({
       {expand && (
         <div className={styles.list}>
           {todoList.length === 0 ? (
-            <div>拖到此处来添加列表</div>
+            <span className={styles.tips}>拖到此处来添加列表</span>
           ) : (
             todoList.map((item, _index) => {
               return (
@@ -214,10 +218,14 @@ const TaskGroup: FC<ITaskGroup> = ({
                   key={item.id}
                   title={item.title}
                   handleSwitch={handleSwitch}
-                  handleRename={handleRename}
+                  handleRename={(id, value) => {
+                    handleRename?.(id, value, LIST_ENUM.LIST);
+                  }}
                   index={_index}
                   gIndex={index}
                   handleRemoveList={handleRemoveList}
+                  gId={id}
+                  groups={groups}
                 />
               );
             })

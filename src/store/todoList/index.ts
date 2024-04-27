@@ -3,6 +3,7 @@ import { isNil, set, uniqueId, get, isEmpty } from 'lodash-es';
 import { LIST_ENUM } from '@/constant/enum';
 import { NAME, INIT_ACTION } from './const';
 import { ITodoList, ITodoGroup } from '@/type';
+import { TSwitchPath } from '@/components/TaskList/type';
 import { createNewName, getRename, getById } from './utils';
 
 export type TListOrGroup = ITodoList | ITodoGroup;
@@ -118,6 +119,30 @@ export const todoListSlice = createSlice({
       const group = state[index] as ITodoGroup;
       const lists = group.todoList || [];
       state.splice(index, 1, ...lists);
+    },
+    switchData(state, action: PayloadAction<[TSwitchPath, TSwitchPath]>) {
+      const [prev, next] = action.payload;
+      const hasChangeParent =
+        prev[0] < next[0] && isNil(prev[1]) && !isNil(next[1]);
+      let tmp;
+      if (!isNil(prev[1])) {
+        if (isNil((state[prev[0]] as ITodoGroup).todoList)) {
+          (state[prev[0]] as ITodoGroup).todoList = [];
+        }
+        tmp = (state[prev[0]] as ITodoGroup).todoList!.splice(prev[1], 1)[0];
+      } else {
+        tmp = state.splice(prev[0], 1)[0];
+      }
+      let gIndex = hasChangeParent ? next[0] - 1 : next[0];
+      let cIndex = next[1];
+      if (!isNil(next[1])) {
+        if (isNil((state[gIndex] as ITodoGroup).todoList)) {
+          (state[gIndex] as ITodoGroup).todoList = [];
+        }
+        (state[gIndex] as ITodoGroup).todoList!.splice(cIndex!, 0, tmp);
+      } else {
+        state.splice(gIndex, 0, tmp);
+      }
     },
   },
   extraReducers: builder => {

@@ -11,7 +11,7 @@ const Default_Name_Map = new Map([
 export const getListOrGroup = (list: TListOrGroup[], type: LIST_ENUM) => {
   return list.reduce<TListOrGroup[]>((prev, cur) => {
     if (cur.type === type) {
-      return [...prev, cur as ITodoList];
+      return [...prev, cur];
     } else {
       return [...prev, ...((cur as ITodoGroup).todoList || [])];
     }

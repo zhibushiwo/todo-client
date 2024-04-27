@@ -1,29 +1,35 @@
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useRef, useState, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { isNil } from 'lodash-es';
+import { isNil, isEmpty } from 'lodash-es';
 import { IDragList, IHandleSwitch, IDragGroup } from '../type';
 import { LIST_SYMBOL, GROUP_SYMBOL } from '../constant';
 import Input from '@/components/Input';
 import { ListIcon } from '@/components/Icons';
 import ListItem from '@/components/ListItem';
 import styles from './style.module.less';
-import { InputRef } from 'antd';
+import { InputRef, MenuProps } from 'antd';
 import { confirmFuc } from '@/utils';
+import { ITodoGroup } from '@/type';
 interface ITaskList {
   id: number;
   index?: number;
   gIndex: number;
+  gId?: id;
   title: string;
   handleSwitch?: IHandleSwitch;
   handleUpdate?: (key: TKeyPath, value: any) => void;
   handleRename?: (id: id, value: string) => void;
   handleRemoveList: (gIndex: number, index?: number) => void;
+  groups?: Pick<ITodoGroup, 'id' | 'title'>[];
 }
 
 enum MenuKeyEnum {
   REMOVE = 'REMOVE',
   ADD = 'ADD',
   RENAME = 'RENAME',
+  COPY = 'COPY',
+  MOVE = 'MOVE',
+  REMOVE_FROM_GROUP = 'REMOVE_FROM_GROUP',
 }
 
 const TaskList: FC<ITaskList> = ({
@@ -35,6 +41,8 @@ const TaskList: FC<ITaskList> = ({
   gIndex,
   title,
   id,
+  groups,
+  gId,
 }) => {
   const [editable, setEditable] = useState(false);
   const domRef = useRef<HTMLDivElement>(null);
@@ -126,7 +134,8 @@ const TaskList: FC<ITaskList> = ({
       inputRef.current?.select();
     }, 0);
   };
-  const onMenuClick = (key: string) => {
+  const onCopy = () => {};
+  const onMenuClick = (key: string, keyPath: string[]) => {
     switch (key) {
       case MenuKeyEnum.REMOVE:
         onDelete();
@@ -134,8 +143,60 @@ const TaskList: FC<ITaskList> = ({
       case MenuKeyEnum.RENAME:
         onRename();
         break;
+      case MenuKeyEnum.COPY:
+        onCopy();
+        break;
     }
   };
+
+  const contextMenuItems = useMemo<MenuProps['items']>(() => {
+    const otherGroup = groups
+      ?.filter(item => {
+        return gId !== item.id;
+      })
+      .map(item => {
+        return {
+          label: item.title,
+          key: item.id,
+        };
+      });
+
+    let menus: MenuProps['items'] = [
+      {
+        label: '重命名列表',
+        key: MenuKeyEnum.RENAME,
+      },
+      {
+        label: '复制列表',
+        key: MenuKeyEnum.COPY,
+      },
+      {
+        label: '移动到',
+        key: MenuKeyEnum.MOVE,
+        children: otherGroup,
+      },
+      {
+        label: '从组中删除',
+        key: MenuKeyEnum.REMOVE_FROM_GROUP,
+      },
+      {
+        type: 'divider',
+      },
+      {
+        label: '删除列表',
+        key: MenuKeyEnum.REMOVE,
+        danger: true,
+      },
+    ];
+    if (isNil(index)) {
+      menus = menus.filter(x => x?.key !== MenuKeyEnum.REMOVE_FROM_GROUP);
+    }
+    if (isEmpty(otherGroup)) {
+      menus = menus.filter(x => x?.key !== MenuKeyEnum.MOVE);
+    }
+    return menus;
+  }, [index, groups, gId]);
+
   return (
     <ListItem
       icon={<ListIcon />}
@@ -149,23 +210,9 @@ const TaskList: FC<ITaskList> = ({
       data-handler-id={handlerId}
       // className={styles['todo-list']}
       contextMenus={{
-        items: [
-          {
-            label: '重命名列表',
-            key: MenuKeyEnum.RENAME,
-          },
-          {
-            type: 'divider',
-          },
-          {
-            label: '删除列表',
-            key: MenuKeyEnum.REMOVE,
-            danger: true,
-          },
-        ],
+        items: contextMenuItems,
         onClick(e) {
-          console.log(e.key);
-          onMenuClick(e.key);
+          onMenuClick(e.key, e.keyPath);
         },
       }}
       ref={domRef}
