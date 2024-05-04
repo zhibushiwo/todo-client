@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import { ArrowDownOutlined, ArrowRightOutlined } from '@ant-design/icons';
-import Todo, { ITodo } from '../Todo';
+import Todo from '../Todo';
+import { ITodo } from '@/type';
 import styles from './style.less';
 interface ITodoList {
   type: string;

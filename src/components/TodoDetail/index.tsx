@@ -7,7 +7,7 @@ import { ITodo } from '@/type';
 import { TodoActions } from '@/store/todo';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 interface ITodoDetail {
-  id: number;
+  id: id;
 }
 
 const TodoDetail: FC<ITodoDetail> = ({ id }) => {

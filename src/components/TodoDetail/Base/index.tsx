@@ -13,6 +13,12 @@ import { TextArea } from '@/components/Input';
 import { ITodo } from '@/type';
 import { MAX_TODO_VALUE } from '@/constant/config';
 import { uniqueId } from 'lodash-es';
+import { TODO_STATUS_ENUM } from '@/constant/enum';
+enum MENU_ACTION {
+  DELETE = 'DELETE',
+  FINISH = 'FINISH',
+}
+
 interface IBase extends ITodo {
   updateTodo: (param: { key: TKeyPath; value: any }) => void;
 }
@@ -58,14 +64,17 @@ const Base: FC<IBase> = ({ updateTodo, ...todo }: IBase) => {
   const switchTodoStatus = () => {
     updateTodo({
       key: ['status'],
-      value: todo.status === 1 ? 0 : 1,
+      value:
+        todo.status === TODO_STATUS_ENUM.COMPLETED
+          ? TODO_STATUS_ENUM.NOT_STARTED
+          : TODO_STATUS_ENUM.COMPLETED,
     });
   };
 
   const switchStepStatus = (index: number) => {
     updateTodo({
-      key: ['steps', index, 'status'],
-      value: todo.steps?.[index]?.status === 1 ? 0 : 1,
+      key: ['steps', index, 'completed'],
+      value: !todo.steps?.[index]?.completed,
     });
   };
 
@@ -73,7 +82,11 @@ const Base: FC<IBase> = ({ updateTodo, ...todo }: IBase) => {
     <div className={styles.wrap}>
       <div className={styles.list}>
         <span className={styles.left} onClick={switchTodoStatus}>
-          {todo.status === 1 ? <CheckSquareFilled /> : <BorderOutlined />}
+          {todo.status === TODO_STATUS_ENUM.COMPLETED ? (
+            <CheckSquareFilled />
+          ) : (
+            <BorderOutlined />
+          )}
         </span>
         <span className={styles.center}>
           <TextArea
@@ -81,7 +94,7 @@ const Base: FC<IBase> = ({ updateTodo, ...todo }: IBase) => {
               minRows: 1,
             }}
             maxLength={MAX_TODO_VALUE}
-            className={`${styles.title} ${todo.status === 1 && 'text-complete'}`}
+            className={`${styles.title} ${todo.status === TODO_STATUS_ENUM.COMPLETED && 'text-complete'}`}
             value={todo.title}
             onChange={handleChangeTitle}
           />
@@ -93,14 +106,14 @@ const Base: FC<IBase> = ({ updateTodo, ...todo }: IBase) => {
       {(todo.steps || []).map((item, index) => (
         <div key={item.id} className={styles.list}>
           <span className={styles.left} onClick={() => switchStepStatus(index)}>
-            {item.status === 1 ? <CheckSquareFilled /> : <BorderOutlined />}
+            {item.completed ? <CheckSquareFilled /> : <BorderOutlined />}
           </span>
           <span className={styles.center}>
             <TextArea
               autoSize={{
                 minRows: 1,
               }}
-              className={`${item.status === 1 && 'text-complete'}`}
+              className={`${item.completed && 'text-complete'}`}
               maxLength={MAX_TODO_VALUE}
               value={item.title}
               onChange={e => {
@@ -114,11 +127,13 @@ const Base: FC<IBase> = ({ updateTodo, ...todo }: IBase) => {
               menu={{
                 items: [
                   {
-                    key: 'finishi',
-                    label: <span>标记为已完成</span>,
+                    key: MENU_ACTION.FINISH,
+                    label: (
+                      <span>{`标记为${item.completed ? '未' : '已'}完成`}</span>
+                    ),
                   },
                   {
-                    key: 'delete',
+                    key: MENU_ACTION.DELETE,
                     label: (
                       <span className='color-red '>
                         <DeleteOutlined /> 删除步骤
@@ -127,8 +142,10 @@ const Base: FC<IBase> = ({ updateTodo, ...todo }: IBase) => {
                   },
                 ],
                 onClick: ({ key }) => {
-                  if (key === 'delete') {
+                  if (key === MENU_ACTION.DELETE) {
                     handleDeleteStep(index);
+                  } else if (key === MENU_ACTION.FINISH) {
+                    switchStepStatus(index);
                   }
                 },
               }}
