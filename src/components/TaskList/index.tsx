@@ -15,57 +15,57 @@ interface ITaskListWrap {}
 
 const TaskListWrap: FC<ITaskListWrap> = () => {
   const dispatch = useAppDispatch();
-  const todoListLength = useRef(0);
+  // const todoListLength = useRef(0);
   const todoLists = useAppSelector(state => state.todoListReducer) || [];
-  const allGroups = useAppSelector(groupSelector);
+  // const allGroups = useAppSelector(groupSelector);
   const handleSwitch = useCallback<IHandleSwitch>((prev, next) => {
     dispatch(TodoListActions.switchData([prev, next]));
   }, []);
 
-  const handleUpdate = useCallback(
-    (key: TKeyPath, value: any) => {
-      dispatch(
-        TodoListActions.updateDataByKey({
-          key,
-          value,
-        })
-      );
-    },
-    [dispatch]
-  );
+  // const handleUpdate = useCallback(
+  //   (key: TKeyPath, value: any) => {
+  //     dispatch(
+  //       TodoListActions.updateDataByKey({
+  //         key,
+  //         value,
+  //       })
+  //     );
+  //   },
+  //   [dispatch]
+  // );
 
-  const handleRename = useCallback((id: id, value: string, type: LIST_ENUM) => {
-    dispatch(
-      TodoListActions.renameData({
-        value,
-        type,
-        id,
-      })
-    );
-  }, []);
+  // const handleRename = useCallback((id: id, value: string, type: LIST_ENUM) => {
+  //   dispatch(
+  //     TodoListActions.renameData({
+  //       value,
+  //       type,
+  //       id,
+  //     })
+  //   );
+  // }, []);
 
-  const removeList = useCallback((gIndex: number, index?: number) => {
-    dispatch(
-      TodoListActions.removeList({
-        gIndex,
-        index,
-      })
-    );
-  }, []);
+  // const removeList = useCallback((gIndex: number, index?: number) => {
+  //   dispatch(
+  //     TodoListActions.removeList({
+  //       gIndex,
+  //       index,
+  //     })
+  //   );
+  // }, []);
 
-  const removeGroup = useCallback((index: number) => {
-    dispatch(TodoListActions.removeGroup(index));
-  }, []);
+  // const removeGroup = useCallback((index: number) => {
+  //   dispatch(TodoListActions.removeGroup(index));
+  // }, []);
 
-  const addList = useCallback((index: number) => {
-    dispatch(TodoListActions.addListByGroupIndex(index));
-  }, []);
+  // const addList = useCallback((index: number) => {
+  //   dispatch(TodoListActions.addListByGroupIndex(index));
+  // }, []);
 
-  useEffect(() => {
-    if (todoListLength.current < todoLists.length) {
-    }
-    todoListLength.current = todoLists.length;
-  }, [todoLists.length]);
+  // useEffect(() => {
+  //   if (todoListLength.current < todoLists.length) {
+  //   }
+  //   todoListLength.current = todoLists.length;
+  // }, [todoLists.length]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -79,14 +79,6 @@ const TaskListWrap: FC<ITaskListWrap> = () => {
                 key={item.title}
                 gIndex={index}
                 title={item.title}
-                handleSwitch={handleSwitch}
-                handleUpdate={handleUpdate}
-                handleRename={(id, value) =>
-                  handleRename(id, value, LIST_ENUM.LIST)
-                }
-                handleRemoveList={removeList}
-                groups={allGroups}
-              
               />
             );
           } else {
@@ -97,16 +89,11 @@ const TaskListWrap: FC<ITaskListWrap> = () => {
                 title={item.title}
                 index={index}
                 todoList={(item as ITodoGroup).todoList || []}
-                handleSwitch={handleSwitch}
-                handleRename={handleRename}
-                handleRemoveList={removeList}
-                handleRemoveGroup={removeGroup}
-                handleAddList={() => addList(index)}
               />
             );
           }
           return (
-            <Fragment>
+            <Fragment key={item.id}>
               {comp}
               <Blank
                 index={index}

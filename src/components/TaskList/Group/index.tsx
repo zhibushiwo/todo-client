@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useRef, useState, memo, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import TaskList from '../List';
 import Input from '@/components/Input';
@@ -12,17 +12,15 @@ import ListItem from '@/components/ListItem';
 import styles from './style.module.less';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { confirmFuc } from '@/utils/';
+import { useAppDispatch } from '@/hooks';
+import { TodoListActions } from '@/store/todoList';
+import { isEqual } from 'lodash-es';
+
 interface ITaskGroup {
   id: number;
   index: number;
   title: string;
   todoList: ITodoList[];
-  groups?: Pick<ITodoGroup, 'id' | 'title'>[];
-  handleSwitch: IHandleSwitch;
-  handleRename?: (id: id, value: string, type: LIST_ENUM) => void;
-  handleRemoveList: (gIndex: number, index?: number) => void;
-  handleRemoveGroup: (index: number) => void;
-  handleAddList: () => void;
 }
 
 enum MenuKeyEnum {
@@ -31,22 +29,34 @@ enum MenuKeyEnum {
   ADD_LIST = 'ADD_LIST',
 }
 
-const TaskGroup: FC<ITaskGroup> = ({
-  handleSwitch,
-  handleRename,
-  handleRemoveList,
-  handleRemoveGroup,
-  handleAddList,
-  index,
-  title,
-  id,
-  todoList = [],
-  groups,
-}) => {
+const TaskGroup: FC<ITaskGroup> = ({ index, title, id, todoList = [] }) => {
   const domRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<InputRef>(null);
   const [editable, setEditable] = useState(false);
   const [expand, setExpand] = useState(false);
+  const dispatch = useAppDispatch();
+  const handleSwitch: IHandleSwitch = (prev, next) => {
+    dispatch(TodoListActions.switchData([prev, next]));
+  };
+
+  const handleRename = (value: string) => {
+    dispatch(
+      TodoListActions.renameData({
+        value,
+        id,
+        type: LIST_ENUM.GROUP,
+      })
+    );
+  };
+
+  const removeGroup = () => {
+    dispatch(TodoListActions.removeGroup(index));
+  };
+
+  const addList = () => {
+    dispatch(TodoListActions.addListByGroupIndex(index));
+  };
+
   const [{ isDragging }, dragRef] = useDrag(
     () => ({
       type: GROUP_SYMBOL,
@@ -122,13 +132,13 @@ const TaskGroup: FC<ITaskGroup> = ({
 
   const changeTitle = (value: string) => {
     if (value !== title && value) {
-      handleRename?.(id, value, LIST_ENUM.GROUP);
+      handleRename(value);
     }
     setEditable(false);
   };
 
   const onAddList = () => {
-    handleAddList();
+    addList();
     if (!expand) setExpand(true);
   };
 
@@ -143,7 +153,7 @@ const TaskGroup: FC<ITaskGroup> = ({
       title: '删除分组',
       content: `将永久删除"${title}"`,
     });
-    handleRemoveGroup(index);
+    removeGroup();
   };
 
   const onMenuClick = (key: string) => {
@@ -159,7 +169,6 @@ const TaskGroup: FC<ITaskGroup> = ({
         break;
     }
   };
-
   return (
     <div ref={domRef} className={styles['todo-group']}>
       <ListItem
@@ -217,15 +226,9 @@ const TaskGroup: FC<ITaskGroup> = ({
                   id={item.id}
                   key={item.id}
                   title={item.title}
-                  handleSwitch={handleSwitch}
-                  handleRename={(id, value) => {
-                    handleRename?.(id, value, LIST_ENUM.LIST);
-                  }}
                   index={_index}
                   gIndex={index}
-                  handleRemoveList={handleRemoveList}
                   gId={id}
-                  groups={groups}
                 />
               );
             })
@@ -236,4 +239,6 @@ const TaskGroup: FC<ITaskGroup> = ({
   );
 };
 
-export default TaskGroup;
+export default memo(TaskGroup, (prev, next) => {
+  return isEqual(prev, next);
+});

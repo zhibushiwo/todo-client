@@ -4,7 +4,7 @@ import { LIST_ENUM } from '@/constant/enum';
 import { NAME, INIT_ACTION } from './const';
 import { ITodoList, ITodoGroup } from '@/type';
 import { TSwitchPath } from '@/components/TaskList/type';
-import { createNewName, getRename, getById } from './utils';
+import { createNewName, getRename, getById, createCopyName } from './utils';
 
 export type TListOrGroup = ITodoList | ITodoGroup;
 
@@ -88,7 +88,6 @@ export const todoListSlice = createSlice({
         (state[gIndex] as ITodoGroup).todoList![index] = data;
       }
     },
-
     updateDataByKey(
       state,
       action: PayloadAction<{
@@ -98,6 +97,41 @@ export const todoListSlice = createSlice({
     ) {
       const { key, value } = action.payload;
       set(state, key, value);
+    },
+    removeFromGroup(
+      state,
+      action: PayloadAction<{
+        gIndex: number;
+        index: number;
+      }>
+    ) {
+      const { gIndex, index } = action.payload;
+      const listItem = (state[gIndex] as ITodoGroup).todoList?.splice(
+        index,
+        1
+      )[0];
+      state.splice(gIndex + 1, 0, listItem!);
+    },
+    moveToGroup(
+      state,
+      action: PayloadAction<{
+        gIndex: number;
+        index?: number;
+        moveToGId: id;
+      }>
+    ) {
+      const { gIndex, index, moveToGId } = action.payload;
+      let listItem: ITodoList;
+      if (isNil(index)) {
+        listItem = state.splice(gIndex, 1)[0];
+      } else {
+        listItem = (state[gIndex] as ITodoGroup).todoList?.splice(index, 1)[0]!;
+      }
+      const moveToIndex = state.findIndex(item => item.id === moveToGId);
+      if (isNil((state[moveToIndex] as ITodoGroup).todoList)) {
+        (state[moveToIndex] as ITodoGroup).todoList = [];
+      }
+      (state[moveToIndex] as ITodoGroup).todoList?.push(listItem);
     },
     removeList(
       state,
@@ -111,6 +145,36 @@ export const todoListSlice = createSlice({
         state.splice(gIndex, 1);
       } else {
         (state[gIndex] as ITodoGroup).todoList?.splice(index, 1);
+      }
+    },
+    copyList(
+      state,
+      action: PayloadAction<{
+        gIndex: number;
+        index?: number;
+      }>
+    ) {
+      const { gIndex, index } = action.payload;
+      let listItem: ITodoList;
+      if (isNil(index)) {
+        listItem = state[gIndex];
+      } else {
+        listItem = (state[gIndex] as ITodoGroup).todoList?.[index]!;
+      }
+      const newName = createCopyName(state, listItem.id);
+      let newListItem: ITodoList = {
+        id: Number(uniqueId()),
+        type: LIST_ENUM.LIST,
+        title: newName,
+      };
+      if (isNil(index)) {
+        state.splice(gIndex + 1, 0, newListItem);
+      } else {
+        (state[gIndex] as ITodoGroup).todoList?.splice(
+          index + 1,
+          0,
+          newListItem
+        );
       }
     },
     removeGroup(state, action: PayloadAction<number>) {

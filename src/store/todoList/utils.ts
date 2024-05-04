@@ -1,4 +1,8 @@
-import { LIST_DEFAULT_NAME, GROUP_DEFAULT_NAME } from '@/constant/config';
+import {
+  LIST_DEFAULT_NAME,
+  GROUP_DEFAULT_NAME,
+  LIST_COPY_SUFFIX,
+} from '@/constant/config';
 import { TListOrGroup } from '@/store/todoList';
 import { LIST_ENUM } from '@/constant/enum';
 import { ITodoList, ITodoGroup } from '@/type';
@@ -18,6 +22,27 @@ export const getListOrGroup = (list: TListOrGroup[], type: LIST_ENUM) => {
   }, []);
 };
 
+// function getListOrGroup(
+//   list: TListOrGroup[],
+//   type: LIST_ENUM.LIST
+// ): ITodoList[];
+// function getListOrGroup(
+//   list: TListOrGroup[],
+//   type: LIST_ENUM.GROUP
+// ): ITodoGroup[];
+// function getListOrGroup(
+//   list: TListOrGroup[],
+//   type: LIST_ENUM
+// ): (ITodoGroup | ITodoList)[] {
+//   return list.reduce<TListOrGroup[]>((prev, cur) => {
+//     if (cur.type === type) {
+//       return [...prev, cur];
+//     } else {
+//       return [...prev, ...((cur as ITodoGroup).todoList || [])];
+//     }
+//   }, []);
+// }
+
 export const getById = (list: TListOrGroup[], type: LIST_ENUM, id: id) => {
   const allList = getListOrGroup(list, type);
   return allList.find(item => item.id === id);
@@ -35,6 +60,27 @@ export const createNewName = (list: TListOrGroup[], type: LIST_ENUM) => {
         return item.title === newName;
       })
     ) {
+      i++;
+    } else {
+      break;
+    }
+  }
+  return newName;
+};
+
+export const createCopyName = (list: TListOrGroup[], copyId: id): string => {
+  const allList = getListOrGroup(list, LIST_ENUM.LIST) as ITodoList[];
+  const copyItem = allList.find(item => item.id === copyId)!;
+  let defaultName = copyItem.title + ' ' + LIST_COPY_SUFFIX;
+  let i = 1;
+  let newName = defaultName;
+  while (true) {
+    if (
+      allList.some(item => {
+        return item.title === newName;
+      })
+    ) {
+      newName = `${defaultName}(${i})`;
       i++;
     } else {
       break;

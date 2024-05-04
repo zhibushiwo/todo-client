@@ -1,4 +1,4 @@
-import React, { FC, useRef } from 'react';
+import React, { FC, useRef, memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { LIST_SYMBOL } from '../constant';
 import { IHandleSwitch } from '../type';
@@ -34,4 +34,4 @@ const Blank: FC<IBlank> = ({ index, handleSwitch }) => {
   );
 };
 
-export default Blank;
+export default memo(Blank);

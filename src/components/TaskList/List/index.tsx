@@ -1,6 +1,6 @@
-import React, { FC, useRef, useState, useMemo } from 'react';
+import React, { FC, useRef, useState, useMemo, memo, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { isNil, isEmpty } from 'lodash-es';
+import { isNil, isEmpty, last } from 'lodash-es';
 import { IDragList, IHandleSwitch, IDragGroup } from '../type';
 import { LIST_SYMBOL, GROUP_SYMBOL } from '../constant';
 import Input from '@/components/Input';
@@ -8,19 +8,19 @@ import { ListIcon } from '@/components/Icons';
 import ListItem from '@/components/ListItem';
 import styles from './style.module.less';
 import { InputRef, MenuProps } from 'antd';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+import { TodoListActions } from '@/store/todoList';
+import { groupSelector } from '@/store/selector';
 import { confirmFuc } from '@/utils';
-import { ITodoGroup } from '@/type';
+import { LIST_ENUM } from '@/constant/enum';
+import { isEqual } from 'lodash-es';
+
 interface ITaskList {
   id: number;
   index?: number;
   gIndex: number;
   gId?: id;
   title: string;
-  handleSwitch?: IHandleSwitch;
-  handleUpdate?: (key: TKeyPath, value: any) => void;
-  handleRename?: (id: id, value: string) => void;
-  handleRemoveList: (gIndex: number, index?: number) => void;
-  groups?: Pick<ITodoGroup, 'id' | 'title'>[];
 }
 
 enum MenuKeyEnum {
@@ -32,21 +32,63 @@ enum MenuKeyEnum {
   REMOVE_FROM_GROUP = 'REMOVE_FROM_GROUP',
 }
 
-const TaskList: FC<ITaskList> = ({
-  handleSwitch,
-  handleUpdate,
-  handleRename,
-  handleRemoveList,
-  index,
-  gIndex,
-  title,
-  id,
-  groups,
-  gId,
-}) => {
+const TaskList: FC<ITaskList> = ({ index, gIndex, title, id, gId }) => {
   const [editable, setEditable] = useState(false);
   const domRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<InputRef>(null);
+  const dispatch = useAppDispatch();
+  const groups = useAppSelector(groupSelector);
+
+  const handleSwitch: IHandleSwitch = (prev, next) => {
+    dispatch(TodoListActions.switchData([prev, next]));
+  };
+
+  const handleRename = (value: string) => {
+    dispatch(
+      TodoListActions.renameData({
+        value,
+        id,
+        type: LIST_ENUM.LIST,
+      })
+    );
+  };
+
+  const removeList = () => {
+    dispatch(
+      TodoListActions.removeList({
+        gIndex,
+        index,
+      })
+    );
+  };
+
+  const moveToGroup = (moveToGId: id) => {
+    dispatch(
+      TodoListActions.moveToGroup({
+        gIndex,
+        index,
+        moveToGId,
+      })
+    );
+  };
+
+  const removeListFromGroup = () => {
+    dispatch(
+      TodoListActions.removeFromGroup({
+        gIndex,
+        index: index!,
+      })
+    );
+  };
+  const copyList = () => {
+    dispatch(
+      TodoListActions.copyList({
+        gIndex,
+        index: index!,
+      })
+    );
+  };
+
   const [{ isDragging, handlerId }, dragRef] = useDrag(
     () => ({
       type: LIST_SYMBOL,
@@ -116,7 +158,7 @@ const TaskList: FC<ITaskList> = ({
   );
   const changeTitle = (value: string) => {
     if (value !== title && value) {
-      handleRename?.(id, value);
+      handleRename(value);
     }
     setEditable(false);
   };
@@ -126,7 +168,7 @@ const TaskList: FC<ITaskList> = ({
       title: '删除列表',
       content: `将永久删除"${title}"`,
     });
-    handleRemoveList(gIndex, index);
+    removeList();
   };
   const onRename = () => {
     setEditable(true);
@@ -134,9 +176,19 @@ const TaskList: FC<ITaskList> = ({
       inputRef.current?.select();
     }, 0);
   };
-  const onCopy = () => {};
+  const onMove = (key: string) => {
+    moveToGroup(Number(key));
+  };
+  const onRemoveFromGroup = () => {
+    removeListFromGroup();
+  };
+  const onCopy = () => {
+    copyList();
+  };
+
   const onMenuClick = (key: string, keyPath: string[]) => {
-    switch (key) {
+    const parentKey = last(keyPath);
+    switch (parentKey) {
       case MenuKeyEnum.REMOVE:
         onDelete();
         break;
@@ -145,6 +197,12 @@ const TaskList: FC<ITaskList> = ({
         break;
       case MenuKeyEnum.COPY:
         onCopy();
+        break;
+      case MenuKeyEnum.MOVE:
+        onMove(key);
+        break;
+      case MenuKeyEnum.REMOVE_FROM_GROUP:
+        onRemoveFromGroup();
         break;
     }
   };
@@ -232,4 +290,6 @@ const TaskList: FC<ITaskList> = ({
   );
 };
 
-export default TaskList;
+export default memo(TaskList, (prev, next) => {
+  return isEqual(prev, next);
+});
