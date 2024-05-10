@@ -11,3 +11,8 @@ export enum TODO_STATUS_ENUM {
   NOT_STARTED = 0,
   COMPLETED = 100,
 }
+
+export enum TODO_IMPORTANT_ENUM {
+  IMPORTANT = 100,
+  UNIMPORTANT = 0,
+}

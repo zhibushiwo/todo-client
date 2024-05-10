@@ -1,10 +1,9 @@
 import React, { FC, useEffect } from 'react';
-import PageHeader from './PageHeader';
 import AddTodo from '@/components/AddTodo';
 import Todo from '@/components/Todo';
-import TodoList from '@/components/TodoList';
 import styles from './style.less';
 import { initTodoListData } from '@/store/todoList';
+import PageSkeleton from '@/components/PageSkeleton';
 import { useAppDispatch } from '@/hooks';
 import { useAppSelector } from '@/hooks';
 interface IMyDay {}
@@ -17,17 +16,17 @@ const MyDay: FC<IMyDay> = () => {
     dispatch(initTodoListData([]));
   }, []);
   return (
-    <div className={styles.wrap}>
-      <PageHeader />
-      <div className={styles.todos}>
+    <PageSkeleton>
+      <PageSkeleton.PageHeader />
+      <PageSkeleton.PageContent>
         {data.map((item, index) => (
           <Todo key={index} {...item} />
         ))}
-      </div>
-      <div className={styles.add}>
+      </PageSkeleton.PageContent>
+      <PageSkeleton.PageFooter>
         <AddTodo />
-      </div>
-    </div>
+      </PageSkeleton.PageFooter>
+    </PageSkeleton>
   );
 };
 

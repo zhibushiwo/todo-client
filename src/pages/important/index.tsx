@@ -1,13 +1,19 @@
 import React, { FC } from 'react';
+import PageSkeleton from '@/components/PageSkeleton';
+import AddTodo from '@/components/AddTodo';
 
-interface IImportant {
-
-}
+interface IImportant {}
 
 const Important: FC<IImportant> = () => {
-
-  return <>Important </>
-
-}
+  return (
+    <PageSkeleton>
+      <PageSkeleton.PageHeader></PageSkeleton.PageHeader>
+      <PageSkeleton.PageContent></PageSkeleton.PageContent>
+      <PageSkeleton.PageFooter>
+        <AddTodo />
+      </PageSkeleton.PageFooter>
+    </PageSkeleton>
+  );
+};
 
 export default Important;

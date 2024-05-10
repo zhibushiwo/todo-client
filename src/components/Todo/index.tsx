@@ -8,6 +8,7 @@ import {
   CheckOutlined,
   CheckSquareFilled,
   BorderOutlined,
+  StarFilled,
 } from '@ant-design/icons';
 import { Drawer } from 'antd';
 import TodoDetail from '@/components/TodoDetail';
@@ -16,7 +17,8 @@ import { ITodo } from '@/type';
 import { isEmpty } from 'lodash-es';
 import { TodoActions } from '@/store/todo';
 import { useAppDispatch } from '@/hooks';
-import { TODO_STATUS_ENUM } from '@/constant/enum';
+import { TODO_STATUS_ENUM, TODO_IMPORTANT_ENUM } from '@/constant/enum';
+import Star from '@/components/Star';
 
 const Todo: FC<ITodo> = todo => {
   const {
@@ -28,6 +30,7 @@ const Todo: FC<ITodo> = todo => {
     remindData,
     isRepeat,
     id,
+    importance,
     status,
   } = todo;
   const dispatch = useAppDispatch();
@@ -45,6 +48,20 @@ const Todo: FC<ITodo> = todo => {
           status === TODO_STATUS_ENUM.COMPLETED
             ? TODO_STATUS_ENUM.NOT_STARTED
             : TODO_STATUS_ENUM.COMPLETED,
+      })
+    );
+  };
+
+  const switchStar = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch(
+      TodoActions.updateTodoByKey({
+        todoId: id,
+        key: 'importance',
+        value:
+          importance === TODO_IMPORTANT_ENUM.IMPORTANT
+            ? TODO_IMPORTANT_ENUM.UNIMPORTANT
+            : TODO_IMPORTANT_ENUM.IMPORTANT,
       })
     );
   };
@@ -94,7 +111,10 @@ const Todo: FC<ITodo> = todo => {
           </div>
         </div>
         <div className={styles.star}>
-          <StarOutlined />
+          <Star
+            star={importance === TODO_IMPORTANT_ENUM.IMPORTANT}
+            onClick={switchStar}
+          />
         </div>
       </div>
       <Drawer open={detailVisible} onClose={() => setDetailVisible(false)}>

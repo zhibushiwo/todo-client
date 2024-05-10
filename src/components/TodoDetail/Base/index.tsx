@@ -10,10 +10,11 @@ import {
 } from '@ant-design/icons';
 import styles from './style.module.less';
 import { TextArea } from '@/components/Input';
+import Star from '@/components/Star';
 import { ITodo } from '@/type';
 import { MAX_TODO_VALUE } from '@/constant/config';
 import { uniqueId } from 'lodash-es';
-import { TODO_STATUS_ENUM } from '@/constant/enum';
+import { TODO_STATUS_ENUM, TODO_IMPORTANT_ENUM } from '@/constant/enum';
 enum MENU_ACTION {
   DELETE = 'DELETE',
   FINISH = 'FINISH',
@@ -71,6 +72,16 @@ const Base: FC<IBase> = ({ updateTodo, ...todo }: IBase) => {
     });
   };
 
+  const switchTodoStar = () => {
+    updateTodo({
+      key: ['im'],
+      value:
+        todo.importance === TODO_IMPORTANT_ENUM.IMPORTANT
+          ? TODO_IMPORTANT_ENUM.UNIMPORTANT
+          : TODO_IMPORTANT_ENUM.IMPORTANT,
+    });
+  };
+
   const switchStepStatus = (index: number) => {
     updateTodo({
       key: ['steps', index, 'completed'],
@@ -100,7 +111,10 @@ const Base: FC<IBase> = ({ updateTodo, ...todo }: IBase) => {
           />
         </span>
         <span className={styles.right}>
-          <StarOutlined />
+          <Star
+            star={todo.importance === TODO_IMPORTANT_ENUM.IMPORTANT}
+            onClick={switchTodoStar}
+          />
         </span>
       </div>
       {(todo.steps || []).map((item, index) => (
