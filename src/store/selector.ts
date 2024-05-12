@@ -13,12 +13,23 @@ export const groupSelector = createSelector(selectSelf, state => {
   );
 });
 
+export const todoTypeSelector = createSelector(selectSelf, state => {
+  return (
+    getListOrGroup(state.todoListReducer, LIST_ENUM.LIST).map(item =>
+      pick(item, 'id', 'title')
+    ) || []
+  );
+});
+
+
 export const listSelector = createSelector(selectSelf, state => {
   return getListOrGroup(state.todoListReducer, LIST_ENUM.LIST) || [];
 });
 
-export const staredTodoSelector = createSelector(selectSelf, state => {
+export const importantTodoSelector = createSelector(selectSelf, state => {
   return state.todoReducer.filter(
     item => item.importance === TODO_IMPORTANT_ENUM.IMPORTANT
   );
 });
+
+

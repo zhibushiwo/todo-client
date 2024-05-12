@@ -1,6 +1,8 @@
 import React, { FC } from 'react';
 
-interface ITitle {}
+interface ITitle {
+  
+}
 
 const Title: FC<ITitle> = () => {
   return (

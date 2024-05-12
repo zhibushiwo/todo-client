@@ -6,7 +6,8 @@ export interface ITodo {
   importance?: number;
   steps?: ITodoStep[];
   listId?: id;
-  todoType?: string;
+  todoType?: id;
+  todoTypeName?: string;
   hasAttachment?: boolean;
   remark?: string;
   remindData?: string;

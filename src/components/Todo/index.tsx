@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import { Drawer } from 'antd';
 import TodoDetail from '@/components/TodoDetail';
-import styles from './style.less';
+import styles from './style.module.less';
 import { ITodo } from '@/type';
 import { isEmpty } from 'lodash-es';
 import { TodoActions } from '@/store/todo';
@@ -24,7 +24,7 @@ const Todo: FC<ITodo> = todo => {
   const {
     title,
     hasAttachment,
-    todoType,
+    todoTypeName,
     steps = [],
     remark,
     remindData,
@@ -76,7 +76,6 @@ const Todo: FC<ITodo> = todo => {
         }}
       >
         <div
-          className={styles.state}
           onClick={e => {
             e.stopPropagation();
             switchTodoStatus();
@@ -90,12 +89,12 @@ const Todo: FC<ITodo> = todo => {
         </div>
         <div className={styles.content}>
           <div
-            className={`${styles.text} ${status === TODO_STATUS_ENUM.COMPLETED && 'text-complete'}`}
+            className={`  ${status === TODO_STATUS_ENUM.COMPLETED ? 'text-complete' : ''}`}
           >
             {title}
           </div>
           <div className={styles.detail}>
-            <span>{todoType}</span>
+            <span>{todoTypeName}</span>
             <span>
               {!isEmpty(steps) && (
                 <>
@@ -110,7 +109,7 @@ const Todo: FC<ITodo> = todo => {
             <span>{hasAttachment && <FileOutlined />}</span>
           </div>
         </div>
-        <div className={styles.star}>
+        <div>
           <Star
             star={importance === TODO_IMPORTANT_ENUM.IMPORTANT}
             onClick={switchStar}

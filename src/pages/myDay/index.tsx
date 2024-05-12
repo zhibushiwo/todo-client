@@ -18,11 +18,7 @@ const MyDay: FC<IMyDay> = () => {
   return (
     <PageSkeleton>
       <PageSkeleton.PageHeader />
-      <PageSkeleton.PageContent>
-        {data.map((item, index) => (
-          <Todo key={index} {...item} />
-        ))}
-      </PageSkeleton.PageContent>
+      <PageSkeleton.PageContent></PageSkeleton.PageContent>
       <PageSkeleton.PageFooter>
         <AddTodo />
       </PageSkeleton.PageFooter>

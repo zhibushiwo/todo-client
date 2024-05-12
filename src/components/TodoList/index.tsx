@@ -4,7 +4,7 @@ import Todo from '../Todo';
 import { ITodo } from '@/type';
 import styles from './style.less';
 interface ITodoList {
-  type: string;
+  type?: string;
   todos: ITodo[];
 }
 
@@ -15,11 +15,13 @@ const TodoList: FC<ITodoList> = ({ type, todos }) => {
   };
   return (
     <div>
-      <div className={styles.title} onClick={handleClick}>
-        <span>{toggle ? <ArrowDownOutlined /> : <ArrowRightOutlined />}</span>
-        <span>{type}</span>
-        <span>{todos.length}</span>
-      </div>
+      {type && (
+        <div className={styles.title} onClick={handleClick}>
+          <span>{toggle ? <ArrowDownOutlined /> : <ArrowRightOutlined />}</span>
+          <span>{type}</span>
+          <span>{todos.length}</span>
+        </div>
+      )}
       {toggle &&
         todos.map(item => {
           return (
