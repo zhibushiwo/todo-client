@@ -13,3 +13,13 @@ export const INIT_TODO_TYPE_TASK = {
   id: -1,
   name: '任务',
 };
+
+export const WEEK_LIST = [
+  '周日',
+  '周一',
+  '周二',
+  '周三',
+  '周四',
+  '周五',
+  '周六',
+];
